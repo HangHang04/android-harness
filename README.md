@@ -348,4 +348,4 @@ py -3 -m ruff check .
 
 ## 致谢
 
-Android Harness 的灵感来自 [ShawnPana/phone-harness](https://github.com/ShawnPana/phone-harness)，特别是它轻量、面向 Agent 的“观察、操作、验证”工作流。本仓库是独立的 Android/ADB 实现，感谢 ShawnPana 公开分享原项目和设计思路。
+Android Harness 的灵感来自 [ShawnPana/phone-harness](https://github.com/ShawnPana/phone-harness)，特别是它轻量、面向 Agent 的“观察、操作、验证”工作流,感谢 ShawnPana 公开分享原项目和设计思路。
