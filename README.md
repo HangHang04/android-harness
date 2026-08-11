@@ -14,7 +14,7 @@ The host runtime does not require root, scrcpy, Appium, or a permanently running
 - Wait for a screen to become stable and detect whether a scroll actually moved.
 - Run explicit Python workflow files with pre-imported helpers.
 - Optionally type Chinese, emoji, and arbitrary Unicode through a small companion IME.
-- Print a compact Codex/Claude skill with `android-harness skill`.
+- Print or locally install the bundled Codex Skill with `android-harness skill`.
 
 ## Requirements
 
@@ -61,6 +61,21 @@ When more than one device is attached, select one explicitly:
 ```powershell
 android-harness --serial 'DEVICE_SERIAL' --json doctor
 ```
+
+## Install the Codex Skill
+
+Install the host runtime for your Windows user, then register the complete bundled Skill in Codex's local skill directory:
+
+```powershell
+py -3 -m pip install --user .
+py -3 -m android_harness.cli --json skill --install
+```
+
+The user install makes the runtime available even when Codex is working in another project. The second command installs `SKILL.md`, UI metadata, a safe Windows launcher, and a wireless/USB recovery reference. Start a new Codex task after installation so the skill list refreshes. The installer leaves a different existing Skill untouched rather than overwriting it.
+
+While developing in this checkout, `.\android-harness.ps1 --json skill --install` performs the same Skill registration without relying on the command being on `PATH`.
+
+Codex's Skill Installer can also install the Skill files directly from this repository at `src/android_harness/skills/android-harness`; the host runtime is still required.
 
 ## Python workflows
 

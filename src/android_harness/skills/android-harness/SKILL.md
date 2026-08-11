@@ -1,17 +1,23 @@
 ---
 name: android-harness
-description: Control and inspect the user's real Android phone from Windows over ADB. Use for Android-only app tasks that require reading the current screen, taking screenshots, finding UI elements, tapping, swiping, pressing keys, opening apps, typing text, or running a verified multi-step phone workflow.
+description: Control and inspect the user's authorized Android phone from Windows over wired or wireless ADB. Use for Android-only tasks that require diagnosing a connection, reading the current screen, taking screenshots, finding UI elements, tapping, swiping, pressing keys, opening apps, typing text, or running a verified multi-step phone workflow.
 ---
 
 # Android Harness
 
 Use `android-harness` as the thin control layer for one user-authorized Android 11+ device.
 
+## Resolve the runtime
+
+Prefer the bundled `scripts/invoke-android-harness.ps1`, resolved relative to this `SKILL.md`. It uses `android-harness.exe` when available and otherwise falls back to the installed Python module. Examples below use `android-harness` for brevity; substitute the invocation script when the command is not on `PATH`.
+
 ## Gate every session
 
 1. Run `android-harness --json doctor` before the first phone action.
 2. If the device is absent, unauthorized, offline, locked, or ambiguous, stop and relay the error.
 3. Let the user pair wireless debugging, approve the RSA prompt, choose a device, and unlock the phone. Never perform or bypass those physical trust steps.
+
+If USB or wireless discovery fails, read `references/wireless-debugging.md` before changing drivers, VPN, firewall, proxy, or phone settings.
 
 Prefer a web, desktop, or API equivalent when it can complete the task without opening personal phone content.
 

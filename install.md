@@ -50,15 +50,24 @@ Some vendor ROMs, especially some Xiaomi-family devices, require a separate **US
 
 ## 3. Register the Agent Skill
 
-For Codex:
+Make the host runtime available to Codex from any project, then install the complete Skill, including its UI metadata, safe launcher, and connection-recovery reference:
 
 ```powershell
-$skillDir = Join-Path $env:USERPROFILE '.codex\skills\android-harness'
-New-Item -ItemType Directory -Path $skillDir -Force | Out-Null
-android-harness skill | Set-Content -LiteralPath (Join-Path $skillDir 'SKILL.md') -Encoding utf8
+py -3 -m pip install --user .
+py -3 -m android_harness.cli --json skill --install
 ```
 
-For Claude Code, use `%USERPROFILE%\.claude\skills\android-harness\SKILL.md` instead. Re-run the command after updating Android Harness so the registered copy stays current.
+If `android-harness` is already on `PATH`, the registration command is equivalently:
+
+```powershell
+android-harness --json skill --install
+```
+
+The default destination is `%CODEX_HOME%\skills\android-harness` when `CODEX_HOME` is set, otherwise `%USERPROFILE%\.codex\skills\android-harness`. Start a new Codex task after installation so skill discovery refreshes. The installer is idempotent for an identical copy and refuses to overwrite a different existing Skill.
+
+During checkout development, `.\android-harness.ps1 --json skill --install` can register the working-tree copy. The installed Skill launcher still needs the user-installed host runtime when Codex later runs it from another project.
+
+On another machine, Codex's Skill Installer can install the same bundle directly from `HangHang04/android-harness`, path `src/android_harness/skills/android-harness`.
 
 ## 4. Optional Unicode companion
 
