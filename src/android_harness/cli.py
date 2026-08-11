@@ -5,7 +5,6 @@ from __future__ import annotations
 import argparse
 import json
 import sys
-from importlib import resources
 from pathlib import Path
 from typing import Any
 
@@ -14,6 +13,7 @@ from .config import load_config
 from .device import create_device
 from .doctor import run_doctor
 from .errors import ExitCode, HarnessError
+from .skill_bundle import install_skill, skill_text
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -93,7 +93,9 @@ def build_parser() -> argparse.ArgumentParser:
     disable = helper_sub.add_parser("disable")
     disable.add_argument("--confirm", action="store_true")
 
-    sub.add_parser("skill", help="Print the bundled Codex/Claude skill text")
+    skill = sub.add_parser("skill", help="Print or install the bundled Codex Skill")
+    skill.add_argument("--install", action="store_true", help="Install the complete Skill")
+    skill.add_argument("--destination", help="Alternate android-harness Skill directory")
     return parser
 
 
@@ -106,6 +108,14 @@ def _emit(value: Any, *, json_mode: bool, success: bool = True) -> None:
         print(json.dumps(value, ensure_ascii=False, indent=2))
 
 
+def _configure_console_stream(stream: Any) -> None:
+    """Keep Windows console encoding gaps from aborting structured output."""
+
+    reconfigure = getattr(stream, "reconfigure", None)
+    if callable(reconfigure):
+        reconfigure(errors="backslashreplace")
+
+
 def _require_confirmation(args: argparse.Namespace, action: str) -> None:
     if not getattr(args, "confirm", False):
         raise HarnessError(
@@ -116,14 +126,18 @@ def _require_confirmation(args: argparse.Namespace, action: str) -> None:
         )
 
 
-def _skill_text() -> str:
-    path = resources.files("android_harness").joinpath(
-        "skills", "android-harness", "SKILL.md"
-    )
-    return path.read_text(encoding="utf-8")
-
-
 def execute(args: argparse.Namespace) -> tuple[Any, int]:
+    if args.command == "skill":
+        if args.destination and not args.install:
+            raise HarnessError(
+                "--destination requires --install.",
+                code=ExitCode.USAGE,
+                kind="invalid_skill_arguments",
+            )
+        if args.install:
+            return install_skill(args.destination), ExitCode.OK
+        return skill_text(), ExitCode.OK
+
     config = load_config()
     if args.command == "devices":
         runner = AdbRunner(args.adb, timeout=config.command_timeout)
@@ -131,8 +145,6 @@ def execute(args: argparse.Namespace) -> tuple[Any, int]:
     if args.command == "doctor":
         report = run_doctor(serial=args.serial, adb_path=args.adb, config=config)
         return report, ExitCode.OK if report["ok"] else ExitCode.GENERAL
-    if args.command == "skill":
-        return _skill_text(), ExitCode.OK
 
     device = create_device(serial=args.serial, adb_path=args.adb, config=config)
     if args.command != "helper":
@@ -226,11 +238,13 @@ def execute(args: argparse.Namespace) -> tuple[Any, int]:
 
 
 def main(argv: list[str] | None = None) -> int:
+    _configure_console_stream(sys.stdout)
+    _configure_console_stream(sys.stderr)
     parser = build_parser()
     args = parser.parse_args(argv)
     try:
         result, code = execute(args)
-        if args.command == "skill" and not args.json:
+        if args.command == "skill" and not args.install and not args.json:
             print(result, end="" if str(result).endswith("\n") else "\n")
         else:
             _emit(result, json_mode=args.json, success=code == ExitCode.OK)

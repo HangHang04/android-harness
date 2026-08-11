@@ -1,4 +1,4 @@
 interface:
   display_name: "Android Harness"
-  short_description: "Control and verify a real Android phone safely over ADB"
-  default_prompt: "Use $android-harness to inspect and safely control my connected Android phone."
+  short_description: "Safely inspect and control an Android phone over ADB"
+  default_prompt: "Use $android-harness to inspect and safely control my authorized Android phone over ADB, verifying every action."
