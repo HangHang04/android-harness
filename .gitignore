@@ -1,0 +1,21 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.venv/
+build/
+dist/
+*.egg-info/
+
+# Android/Gradle outputs and machine-specific configuration
+.gradle/
+companion/.gradle/
+companion/local.properties
+companion/**/build/
+*.apk
+*.aab
+
+# IDE files
+.idea/
+.vscode/
+*.iml

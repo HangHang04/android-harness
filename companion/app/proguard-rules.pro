@@ -1,0 +1,2 @@
+-keep class dev.androidharness.companion.HarnessImeService { *; }
+-keep class dev.androidharness.companion.CommitTextReceiver { *; }

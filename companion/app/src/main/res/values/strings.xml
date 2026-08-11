@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Android Harness Companion</string>
+    <string name="ime_name">Android Harness IME</string>
+    <string name="setup_title">Unicode input companion</string>
+    <string name="setup_body">This optional keyboard accepts explicit text commits from ADB. It has no network, storage, accessibility, or background-service permission. Enable it only after reviewing the project. Android Harness restores your previous keyboard after each commit.</string>
+    <string name="open_keyboard_settings">Open keyboard settings</string>
+    <string name="show_keyboard_picker">Show keyboard picker</string>
+    <string name="test_field_hint">Focus this field to test Chinese, emoji, and multi-line input.</string>
+    <string name="status_enabled">Status: Android Harness IME is enabled.</string>
+    <string name="status_disabled">Status: Android Harness IME is not enabled.</string>
+</resources>

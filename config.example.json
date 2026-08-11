@@ -1,0 +1,7 @@
+{
+  "default_serial": null,
+  "command_timeout": 15,
+  "app_aliases": {
+    "settings": "com.android.settings"
+  }
+}
