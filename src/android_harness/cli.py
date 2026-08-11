@@ -108,6 +108,14 @@ def _emit(value: Any, *, json_mode: bool, success: bool = True) -> None:
         print(json.dumps(value, ensure_ascii=False, indent=2))
 
 
+def _configure_console_stream(stream: Any) -> None:
+    """Keep Windows console encoding gaps from aborting structured output."""
+
+    reconfigure = getattr(stream, "reconfigure", None)
+    if callable(reconfigure):
+        reconfigure(errors="backslashreplace")
+
+
 def _require_confirmation(args: argparse.Namespace, action: str) -> None:
     if not getattr(args, "confirm", False):
         raise HarnessError(
@@ -230,6 +238,8 @@ def execute(args: argparse.Namespace) -> tuple[Any, int]:
 
 
 def main(argv: list[str] | None = None) -> int:
+    _configure_console_stream(sys.stdout)
+    _configure_console_stream(sys.stderr)
     parser = build_parser()
     args = parser.parse_args(argv)
     try:

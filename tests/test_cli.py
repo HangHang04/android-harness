@@ -4,11 +4,11 @@ import json
 import tempfile
 import unittest
 from contextlib import redirect_stdout
-from io import StringIO
+from io import BytesIO, StringIO, TextIOWrapper
 from pathlib import Path
 from unittest.mock import patch
 
-from android_harness.cli import _emit, build_parser, execute, main
+from android_harness.cli import _configure_console_stream, _emit, build_parser, execute, main
 
 
 class CliTests(unittest.TestCase):
@@ -31,6 +31,16 @@ class CliTests(unittest.TestCase):
         with redirect_stdout(output):
             _emit({"ok": False}, json_mode=True, success=False)
         self.assertIn('"ok": false', output.getvalue())
+
+    def test_console_stream_escapes_characters_missing_from_windows_encoding(self) -> None:
+        buffer = BytesIO()
+        stream = TextIOWrapper(buffer, encoding="gbk")
+        _configure_console_stream(stream)
+
+        stream.write("✨")
+        stream.flush()
+
+        self.assertEqual(b"\\u2728", buffer.getvalue())
 
     def test_skill_install_accepts_an_explicit_destination(self) -> None:
         args = build_parser().parse_args(
