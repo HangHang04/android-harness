@@ -8,7 +8,7 @@ Android Harness 通过 Android 自带的 ADB 和 UI Automator，让 Codex 这类
 
 ## 最省事的用法：直接让 Agent 帮你装
 
-如果你本来就是想让 Codex / Agent 操作手机，其实不用先把这一整页命令都看完。
+如果你本来就是想让 Codex / Agent 操作手机，其实不用先把这一整页命令都看完。可以让Agent教你如何使用，或者可以跳转到后面的“手机如何连接”那一步，只有连接这步需要留意一下。
 
 把仓库链接发给支持本地 Skill 的 Agent，然后直接告诉它：
 
@@ -42,18 +42,6 @@ Agent 可以帮你处理仓库下载、Python 包安装、Skill 安装和连接�
 ```
 
 如果这样已经能用，后面的内容可以等遇到问题再看。
-
-## 它大概是怎么工作的？
-
-整个过程其实就三件事：
-
-```mermaid
-flowchart LR
-    A["电脑能通过 ADB 看到手机"] --> B["Android Harness 读取 / 操作界面"]
-    B --> C["Agent 用 Skill 自己观察、操作、再检查"]
-```
-
-也就是说：**先让 ADB 连上手机，后面就可以把大部分事情交给 Agent。**
 
 ## 环境要求
 
@@ -349,6 +337,18 @@ ASCII 文本可以通过标准输入发送：
 ```
 
 ADB 原生输入对 Unicode 支持有限。中文、emoji 和其他 Unicode 文本需要可选 companion IME；项目不会为了“看起来成功”而偷偷丢字。
+
+## 它大概是怎么工作的？
+
+整个过程其实就三件事：
+
+```mermaid
+flowchart LR
+    A["电脑能通过 ADB 看到手机"] --> B["Android Harness 读取 / 操作界面"]
+    B --> C["Agent 用 Skill 自己观察、操作、再检查"]
+```
+
+也就是说：**先让 ADB 连上手机，后面就可以把大部分事情交给 Agent。**
 
 ## 能做什么
 
