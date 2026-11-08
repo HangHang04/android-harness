@@ -16,5 +16,6 @@ jobs:
           packages: platform-tools
           log-accepted-android-sdk-licenses: false
       - run: sdkmanager 'platforms;android-35' 'build-tools;34.0.0'
+      - uses: gradle/actions/setup-gradle@v4
       - run: chmod +x companion/gradlew
       - run: ./companion/gradlew -p companion :app:testDebugUnitTest :app:lintDebug :app:assembleDebug
