@@ -6,6 +6,29 @@ Android Harness 通过 Android 自带的 ADB 和 UI Automator，让 Codex 这类
 
 如果你只是想尽快用起来，**不用先看懂 ADB，也不用从头读完整篇 README。** 最省事的方式就是把这个仓库交给 Agent，让它自己帮你装；你只在手机必须本人确认的时候配合一下就行。
 
+## 手机工作台（0.3）
+
+现在可以在电脑浏览器中连接设备、批准 Codex 任务、观察手机画面和元素、查看操作结果并停止任务。界面采用浅白与淡蓝配色，中文优先。
+
+```powershell
+# 仓库中直接启动当前源码
+.\android-harness.ps1 console
+# 安装后启动
+android-harness console
+```
+
+![电脑控制台](docs/images/console-connect.png)
+
+依次打开“连接设备 → 任务与授权 → 操作工作台”。授权选择设备、应用包名及观察/交互/文件能力，批准后有效 30 分钟。支持 USB 和无线调试向导；配对端口与调试连接端口分别填写。截图按需采集，页面显示采集时间。手机端配套助手提供中文设置引导与输入测试。
+
+Codex 使用 `task request --stdin` 提交请求，用户在控制台批准后使用 `task action` 执行。新增 `capabilities`、`observe`、资源 ID/文本/描述定位、条件等待、声明式批次、限定目录文件传输和 HTTP/HTTPS 页面跳转。完整参数见 [任务接口说明](src/android_harness/skills/android-harness/references/managed-tasks.md)。
+
+停止阻止后续步骤，已经提交的动作可能已生效。任务失败、断连、锁屏或授权过期后需要重新开始。输入正文、截图和配对码不进入操作记录。界面审批与 AI 执行使用独立凭据；控制台只监听本机回环地址。
+
+任务授权约束受管入口；旧 CLI 与 Python `run` 仍是本机受信任工具。安装、删除与权限变更保留单独确认。现有不同版本的本地 Skill 仍由安装器保护，更新前请保存并检查已有自定义内容。
+
+开发验证：`$env:PYTHONPATH = 'src'; py -3 -m unittest discover -s tests -v`。Android 构建使用 JDK 17、SDK 35，执行 `companion\gradlew.bat -p companion :app:testDebugUnitTest :app:lintDebug :app:assembleDebug`。
+
 ## 最省事：直接让 Agent 帮你装
 
 把这个仓库链接发给支持本地 Skill 的 Agent（例如 Codex），然后直接把下面这段话发给它：

@@ -11,6 +11,10 @@ Use `android-harness` as the thin control layer for one user-authorized Android 
 
 Prefer the bundled `scripts/invoke-android-harness.ps1`, resolved relative to this `SKILL.md`. It uses `android-harness.exe` when available and otherwise falls back to the installed Python module. Examples below use `android-harness` for brevity; substitute the invocation script when the command is not on `PATH`.
 
+## Console tasks (preferred for ongoing control)
+
+For visible progress, scoped grants and cancellation, use the local console and managed task API described in [references/managed-tasks.md](references/managed-tasks.md). Request only the device, applications and capabilities needed for the goal. Wait for the user to approve the request in the console. Execute subsequent actions through `task action`, then complete the task. Never approve your own request or fall back to legacy commands after a denied or revoked grant.
+
 ## Gate every session
 
 1. Run `android-harness --json doctor` before the first phone action.
@@ -48,7 +52,7 @@ The workflow receives `screen_info`, `screenshot`, `ui`, `find`, `tap`, `tap_tex
 
 ## Consent and privacy
 
-Ask immediately before sending messages, posting, purchasing, deleting, changing settings or permissions, installing software, enabling an input method, or taking another outward-facing or hard-to-reverse action.
+Within a console-approved task, ordinary actions covered by the stated goal and grant may continue without repeated questions. Obtain approval for additional outward-facing consequences outside that goal. Installation, deletion, permission changes and enabling an input method retain individual confirmation. A task grant cannot determine the business meaning of arbitrary buttons.
 
 Read only the personal content necessary for the user's task. Do not browse adjacent messages, photos, mail, notifications, authentication codes, or account data. Never expose typed text or screenshots in logs unless the user explicitly requests artifacts.
 

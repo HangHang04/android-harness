@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "android-harness"
-version = "0.2.0"
+version = "0.3.0"
 description = "A thin, agent-friendly ADB harness for controlling a real Android phone"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -29,6 +29,9 @@ where = ["src"]
 
 [tool.setuptools.package-data]
 android_harness = [
+    "web/*.html",
+    "web/*.css",
+    "web/*.js",
     "skills/android-harness/SKILL.md",
     "skills/android-harness/agents/*.yaml",
     "skills/android-harness/references/*.md",

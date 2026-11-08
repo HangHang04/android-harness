@@ -19,3 +19,5 @@ companion/**/build/
 .idea/
 .vscode/
 *.iml
+
+.gradle-isolated/

@@ -1,0 +1,17 @@
+name: Android companion
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v3
+      - run: sdkmanager 'platforms;android-35' 'build-tools;34.0.0'
+      - run: chmod +x companion/gradlew
+      - run: ./companion/gradlew -p companion :app:testDebugUnitTest :app:lintDebug :app:assembleDebug
