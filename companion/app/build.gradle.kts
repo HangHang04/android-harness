@@ -31,6 +31,8 @@ android {
     }
 
     lint {
+        // SDK 35 and the test libraries define the supported compatibility baseline.
+        disable += setOf("OldTargetApi", "GradleDependency")
         abortOnError = true
         warningsAsErrors = true
     }
