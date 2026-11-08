@@ -53,8 +53,10 @@ def parse_hierarchy(xml_text: str) -> list[UiNode]:
             index = fallback_index
         nodes.append(
             UiNode(
-                text=attrs.get("text", ""),
-                content_desc=attrs.get("content-desc", ""),
+                text="" if _as_bool(attrs.get("password")) else attrs.get("text", ""),
+                content_desc=""
+                if _as_bool(attrs.get("password"))
+                else attrs.get("content-desc", ""),
                 resource_id=attrs.get("resource-id", ""),
                 class_name=attrs.get("class", ""),
                 package=attrs.get("package", ""),
@@ -65,6 +67,9 @@ def parse_hierarchy(xml_text: str) -> list[UiNode]:
                 selected=_as_bool(attrs.get("selected")),
                 focused=_as_bool(attrs.get("focused")),
                 index=index,
+                password=_as_bool(attrs.get("password")),
+                checkable=_as_bool(attrs.get("checkable")),
+                checked=_as_bool(attrs.get("checked")),
             )
         )
     return nodes
@@ -91,8 +96,10 @@ def find_nodes(
         if clickable is not None and node.clickable is not clickable:
             continue
         labels = (node.text.casefold(), node.content_desc.casefold())
-        matched = any(label == query_folded for label in labels) if exact else any(
-            query_folded in label for label in labels if label
+        matched = (
+            any(label == query_folded for label in labels)
+            if exact
+            else any(query_folded in label for label in labels if label)
         )
         if matched:
             filtered.append(node)
@@ -135,6 +142,7 @@ def content_signature(nodes: Iterable[UiNode], screen_height: int) -> str:
                 node.bounds.to_list(),
                 node.enabled,
                 node.selected,
+                node.checked,
             )
         )
     payload = json.dumps(rows, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
@@ -145,9 +153,7 @@ def content_labels(nodes: Iterable[UiNode], screen_height: int) -> frozenset[str
     top = screen_height * 0.06
     bottom = screen_height * 0.94
     labels = {
-        node.label.strip()
-        for node in nodes
-        if top < node.center[1] < bottom and node.label.strip()
+        node.label.strip() for node in nodes if top < node.center[1] < bottom and node.label.strip()
     }
     return frozenset(labels)
 

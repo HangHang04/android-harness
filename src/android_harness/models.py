@@ -65,6 +65,9 @@ class UiNode:
     selected: bool
     focused: bool
     index: int
+    password: bool = False
+    checkable: bool = False
+    checked: bool = False
 
     @property
     def center(self) -> tuple[int, int]:
@@ -76,8 +79,8 @@ class UiNode:
 
     def to_dict(self) -> dict[str, Any]:
         return {
-            "text": self.text,
-            "content_desc": self.content_desc,
+            "text": "" if self.password else self.text,
+            "content_desc": "" if self.password else self.content_desc,
             "resource_id": self.resource_id,
             "class_name": self.class_name,
             "package": self.package,
@@ -89,6 +92,9 @@ class UiNode:
             "selected": self.selected,
             "focused": self.focused,
             "index": self.index,
+            "password": self.password,
+            "checkable": self.checkable,
+            "checked": self.checked,
         }
 
 

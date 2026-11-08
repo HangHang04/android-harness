@@ -110,3 +110,11 @@ Fix the first required failure from `android-harness --json doctor`:
 7. UI hierarchy empty or malformed.
 
 The optional Unicode companion appears as a non-required doctor check.
+
+## 6. Local console and managed tasks
+
+Run `android-harness console` after updating the host package. From a checkout use `.\android-harness.ps1 console`, which selects the checkout source directly. The browser opens with a one-time bootstrap credential, then uses an HttpOnly cookie. Only loopback connections are accepted. Keep this process running while Codex uses `task request`, `task list`, and `task action`.
+
+The installed Codex Skill is a separate copy. The installer intentionally refuses to replace a different existing copy. Preserve any customizations and review the new bundled instructions before replacing that copy. For a review install use a fresh directory ending in `android-harness`, e.g. `skill --install --destination E:/review/android-harness`.
+
+Task grants live in memory and expire after 30 minutes or console restart. File transfer requires existing roots explicitly included in the grant. Screenshots are requested explicitly and not included in task event logs.

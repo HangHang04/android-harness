@@ -5,8 +5,8 @@ from __future__ import annotations
 import os
 import shutil
 import subprocess
+from collections.abc import Iterable
 from pathlib import Path
-from typing import Iterable
 
 from .errors import AdbNotFoundError, ExitCode, HarnessError
 from .models import CommandResult, DeviceInfo
@@ -50,8 +50,7 @@ def find_adb() -> Path:
     checked = [str(path) for path in adb_candidates()]
     raise AdbNotFoundError(
         "ADB was not found. Install Android SDK Platform Tools or set "
-        "ANDROID_HARNESS_ADB to adb.exe."
-        + (f" Checked: {checked}" if checked else "")
+        "ANDROID_HARNESS_ADB to adb.exe." + (f" Checked: {checked}" if checked else "")
     )
 
 
@@ -67,7 +66,7 @@ class AdbRunner:
         self.serial = serial
         self.timeout = timeout
 
-    def with_serial(self, serial: str) -> "AdbRunner":
+    def with_serial(self, serial: str) -> AdbRunner:
         return AdbRunner(self.adb_path, serial=serial, timeout=self.timeout)
 
     def run(
@@ -104,10 +103,10 @@ class AdbRunner:
             process = subprocess.run(command, **kwargs)  # type: ignore[arg-type]
         except subprocess.TimeoutExpired as exc:
             raise HarnessError(
-                f"ADB command timed out after {kwargs['timeout']} seconds: {arg_list}",
+                f"ADB command timed out after {kwargs['timeout']} seconds.",
                 code=ExitCode.TIMEOUT,
                 kind="adb_timeout",
-                details={"args": arg_list},
+                details={"operation": arg_list[0] if arg_list else "adb"},
             ) from exc
         except OSError as exc:
             raise AdbNotFoundError(f"Could not execute ADB at {self.adb_path}: {exc}") from exc
@@ -126,10 +125,13 @@ class AdbRunner:
             if not message and isinstance(stdout, str):
                 message = stdout.strip()
             raise HarnessError(
-                f"ADB command failed ({process.returncode}): {message or arg_list}",
+                f"ADB command failed ({process.returncode}). Check the device connection.",
                 code=ExitCode.OPERATION,
                 kind="adb_command_failed",
-                details={"args": arg_list, "returncode": process.returncode},
+                details={
+                    "operation": arg_list[0] if arg_list else "adb",
+                    "returncode": process.returncode,
+                },
             )
         return result
 

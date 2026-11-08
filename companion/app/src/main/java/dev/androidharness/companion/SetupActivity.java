@@ -24,12 +24,14 @@ public final class SetupActivity extends Activity {
 
         int padding = Math.round(24 * getResources().getDisplayMetrics().density);
         LinearLayout content = new LinearLayout(this);
+        content.setBackgroundColor(0xFFF7FAFF);
         content.setOrientation(LinearLayout.VERTICAL);
         content.setPadding(padding, padding, padding, padding);
 
         TextView title = new TextView(this);
         title.setText(R.string.setup_title);
-        title.setTextSize(24);
+        title.setTextSize(28);
+        title.setTextColor(0xFF24374E);
         content.addView(title, matchWidthWrapHeight());
 
         TextView explanation = new TextView(this);
@@ -64,6 +66,14 @@ public final class SetupActivity extends Activity {
 
         ScrollView scrollView = new ScrollView(this);
         scrollView.addView(content);
+        scrollView.setFillViewport(true);
+        scrollView.setOnApplyWindowInsetsListener((view, insets) -> {
+            android.graphics.Insets bars = insets.getInsets(
+                    android.view.WindowInsets.Type.systemBars()
+                    | android.view.WindowInsets.Type.ime());
+            view.setPadding(bars.left, bars.top, bars.right, bars.bottom);
+            return insets;
+        });
         setContentView(scrollView);
     }
 
@@ -73,12 +83,17 @@ public final class SetupActivity extends Activity {
         String enabled = Settings.Secure.getString(
                 getContentResolver(), Settings.Secure.ENABLED_INPUT_METHODS);
         boolean isEnabled = enabled != null && enabled.contains(getPackageName());
-        status.setText(isEnabled ? R.string.status_enabled : R.string.status_disabled);
+        String current = Settings.Secure.getString(
+                getContentResolver(), Settings.Secure.DEFAULT_INPUT_METHOD);
+        status.setText(getString(R.string.status_summary,
+                getString(isEnabled ? R.string.status_enabled : R.string.status_disabled),
+                getString(R.string.current_keyboard, current == null ? "—" : current)));
     }
 
     private static LinearLayout.LayoutParams matchWidthWrapHeight() {
-        return new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        params.bottomMargin = 24;
+        return params;
     }
 }

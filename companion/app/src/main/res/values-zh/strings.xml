@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Android Harness 配套助手</string>
+    <string name="ime_name">Android Harness 输入辅助</string>
+    <string name="setup_title">让文字，顺畅抵达。</string>
+    <string name="setup_body">配合电脑控制台，向手机输入中文、emoji 和多行文字。
+
+01  在系统键盘设置中启用输入辅助。
+02  在下方聚焦测试输入框。
+03  从电脑提交一段测试文字。
+
+每次提交后，电脑会恢复原来的键盘。日常使用时保留你熟悉的输入法即可。</string>
+    <string name="open_keyboard_settings">第一步 · 打开键盘设置</string>
+    <string name="show_keyboard_picker">选择或恢复常用键盘</string>
+    <string name="test_field_hint">点这里，再让电脑输入中文、emoji 或多行文字。</string>
+    <string name="status_enabled">输入辅助已启用 · 可供电脑提交文字</string>
+    <string name="status_disabled">等待启用 · 请先完成第一步</string>
+    <string name="current_keyboard">当前键盘：%1$s</string>
+</resources>

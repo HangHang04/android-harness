@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Android Harness · 手机工作台</title>
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body>
+    <aside>
+      <div class="brand"><span class="mark">A</span> Android Harness</div>
+      <p class="eyebrow">与你的手机，一起工作</p>
+      <nav>
+        <button data-page="connect" class="selected">连接设备</button
+        ><button data-page="work">操作工作台</button
+        ><button data-page="tasks">任务与授权</button
+        ><button data-page="help">设置与帮助</button>
+      </nav>
+      <div class="aside-foot">由 Codex 理解任务<br />由你掌握操作范围</div>
+    </aside>
+    <main>
+      <header>
+        <div>
+          <p class="eyebrow">ANDROID HARNESS / WORKSPACE</p>
+          <h1 id="pageTitle">连接设备</h1>
+        </div>
+        <span class="badge" id="status">等待连接</span>
+      </header>
+      <div id="notice" role="status" aria-live="polite">
+        正在连接本机控制台…
+      </div>
+      <section id="connect" class="page">
+        <div class="intro">
+          <span class="badge">从这里开始</span>
+          <h2>让手机，成为 AI 的工作伙伴。</h2>
+          <p>连接你的 Android 设备，在清楚的授权范围内完成观察和操作。</p>
+        </div>
+        <div class="grid">
+          <article>
+            <h2>01 / 选择你的设备</h2>
+            <p>先在手机开启调试并完成系统授权。</p>
+            <button id="refresh">刷新设备</button>
+            <div id="devices"></div>
+          </article>
+          <article>
+            <h2>02 / 选择连接方式</h2>
+            <details open>
+              <summary>USB 数据线</summary>
+              <ol>
+                <li>开启开发者选项与 USB 调试。</li>
+                <li>连接可传数据的数据线，保持手机解锁。</li>
+                <li>在手机确认电脑的 RSA 授权，再刷新设备。</li>
+              </ol>
+            </details>
+            <details>
+              <summary>无线调试</summary>
+              <p>
+                电脑与手机连接同一局域网。先用配对弹窗的端口与配对码，再用无线调试主页面的连接端口。
+              </p>
+              <form id="wireless">
+                <label
+                  >手机 IP<input
+                    name="host"
+                    required
+                    placeholder="192.168.137.2" /></label
+                ><label
+                  >当前端口<input
+                    name="port"
+                    required
+                    type="number"
+                    min="1"
+                    max="65535" /></label
+                ><label
+                  >配对码（仅配对时填写）<input
+                    name="code"
+                    autocomplete="off"
+                    type="password"
+                    inputmode="numeric" /></label
+                ><button name="pair" value="yes">配对</button
+                ><button name="connect" value="yes">连接</button>
+              </form>
+            </details>
+          </article>
+        </div>
+      </section>
+      <section id="work" class="page" hidden>
+        <div class="workspace">
+          <article class="preview">
+            <div class="row">
+              <h2>手机画面</h2>
+              <button id="observe">重新观察</button>
+            </div>
+            <p id="captured">批准任务后，按需读取画面。</p>
+            <div id="screen">
+              <img id="phone" alt="当前手机截图" hidden />
+              <div id="highlight" hidden></div>
+              <p id="screenEmpty">连接 → 授权 → 开始观察</p>
+            </div>
+            <div class="keys">
+              <button data-key="back">返回</button
+              ><button data-key="home">主页</button
+              ><button data-swipe="up">向上滑动</button
+              ><button data-swipe="down">向下滑动</button>
+            </div>
+          </article>
+          <div>
+            <article>
+              <h2>可操作元素</h2>
+              <p>先选择元素确认位置，再执行点击。</p>
+              <div id="nodes" class="nodes"></div>
+              <button id="tapNode" disabled>点击所选元素</button>
+            </article>
+            <article>
+              <h2>输入文字</h2>
+              <textarea
+                id="text"
+                placeholder="在手机聚焦输入框后输入，支持中文与多行"
+              ></textarea
+              ><button id="type">输入到手机</button>
+            </article>
+            <article>
+              <h2>应用与页面</h2>
+              <input
+                id="package"
+                placeholder="应用包名，例如 com.android.settings"
+                aria-label="应用包名"
+              /><input
+                id="url"
+                placeholder="https://…（打开网页时填写）"
+                aria-label="网页地址"
+              /><button id="openApp">打开应用</button
+              ><button id="openUrl">打开页面</button>
+            </article>
+          </div>
+        </div>
+      </section>
+      <section id="tasks" class="page" hidden>
+        <div class="grid">
+          <article>
+            <h2>创建任务</h2>
+            <p>也可以让 Codex 提交请求，然后在这里查看和批准。</p>
+            <form id="taskForm">
+              <label
+                >任务目标<input
+                  name="goal"
+                  required
+                  placeholder="例如：查看设置中的设备信息" /></label
+              ><label
+                >设备<select
+                  name="serial"
+                  id="deviceSelect"
+                  required
+                ></select></label
+              ><label
+                >允许的应用包名（逗号分隔）<input
+                  name="packages"
+                  required
+                  value="com.android.settings"
+              /></label>
+              <fieldset>
+                <legend>允许的能力</legend>
+                <label class="check"
+                  ><input
+                    type="checkbox"
+                    name="observe"
+                    checked
+                  />观察页面与截图</label
+                ><label class="check"
+                  ><input
+                    type="checkbox"
+                    name="interact"
+                  />点击、输入、滑动和跳转</label
+                ><label class="check"
+                  ><input type="checkbox" name="files" />文件传输</label
+                >
+              </fieldset>
+              <label
+                >电脑文件目录（文件传输时填写）<input
+                  name="local_root"
+                  placeholder="E:\\files" /></label
+              ><label
+                >手机文件目录<input
+                  name="remote_root"
+                  placeholder="/sdcard/Download/AndroidHarness"
+              /></label>
+              <p>授权批准后持续 30 分钟，可随时停止。</p>
+              <button>提交审批</button>
+            </form>
+          </article>
+          <article>
+            <h2>任务请求与记录</h2>
+            <div id="taskList"></div>
+          </article>
+        </div>
+      </section>
+      <section id="help" class="page" hidden>
+        <article>
+          <h2>用 Codex 开始工作</h2>
+          <p>
+            对 Codex 说：“用 android-harness
+            创建一个查看手机设置的任务，等待我批准后执行。”
+          </p>
+          <p>本机启动：<code>android-harness console</code></p>
+          <p>设备检查：<code>android-harness --json doctor</code></p>
+          <p>
+            AI 接口：<code>task request --stdin</code>、<code>task list</code
+            >、<code>task action 任务ID 操作 --stdin</code>
+          </p>
+          <p>
+            手机需要 Android 11
+            或更高版本。中文输入需要安装并启用配套输入法，提交后恢复原键盘。
+          </p>
+          <h2>连接问题怎么处理</h2>
+          <p>
+            没有设备：检查数据线、USB 端口，或使用无线调试。待授权：在手机确认
+            RSA 弹窗。离线：重新连接。锁屏：由本人解锁。多个设备：明确选择目标。
+          </p>
+          <h2>任务授权的边界</h2>
+          <p>
+            停止后不再开始新步骤；已经提交的操作可能已生效。超出任务的发送、删除、安装和权限变更应单独确认。任务授权约束本工具的受管入口，本机脚本与其他
+            ADB 客户端仍由你管理。
+          </p>
+          <h2>当前配置</h2>
+          <pre id="config"></pre>
+        </article>
+      </section>
+      <footer id="taskBar">
+        <span id="activeSummary">当前没有活动任务</span>
+        <div>
+          <button id="complete">完成任务</button
+          ><button id="stop" class="danger">停止任务</button>
+        </div>
+      </footer>
+    </main>
+    <script src="/app.js"></script>
+  </body>
+</html>

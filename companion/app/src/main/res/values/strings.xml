@@ -9,4 +9,6 @@
     <string name="test_field_hint">Focus this field to test Chinese, emoji, and multi-line input.</string>
     <string name="status_enabled">Status: Android Harness IME is enabled.</string>
     <string name="status_disabled">Status: Android Harness IME is not enabled.</string>
+    <string name="current_keyboard">Current keyboard: %1$s</string>
+    <string name="status_summary" translatable="false">%1$s\n%2$s</string>
 </resources>

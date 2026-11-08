@@ -26,6 +26,30 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--json", action="store_true", help="Emit a stable JSON envelope")
     sub = parser.add_subparsers(dest="command", required=True)
 
+    console = sub.add_parser("console", help="Open the local control console")
+    console.add_argument("--port", type=int, default=0)
+    console.add_argument("--no-open", action="store_true")
+    for name in ("capabilities", "observe", "find", "tap-element", "wait-for", "batch", "open-url"):
+        command = sub.add_parser(name, help="Structured device operation")
+        command.add_argument("--stdin", action="store_true", help="Read JSON arguments from stdin")
+        command.add_argument("--screenshot", action="store_true")
+    files_parser = sub.add_parser("files", help="Transfer a file under an approved task")
+    files_sub = files_parser.add_subparsers(dest="direction", required=True)
+    for direction in ("push", "pull"):
+        transfer_parser = files_sub.add_parser(direction)
+        transfer_parser.add_argument("--task", required=True)
+        transfer_parser.add_argument("--stdin", action="store_true", required=True)
+    task = sub.add_parser("task", help="Request and use a console-approved task")
+    task_sub = task.add_subparsers(dest="task_command", required=True)
+    task_sub.add_parser("list")
+    task_sub.add_parser("request").add_argument("--stdin", action="store_true", required=True)
+    for name in ("stop", "complete"):
+        task_sub.add_parser(name).add_argument("task_id")
+    task_action = task_sub.add_parser("action")
+    task_action.add_argument("task_id")
+    task_action.add_argument("action")
+    task_action.add_argument("--stdin", action="store_true")
+
     sub.add_parser("devices", help="List attached ADB devices")
     sub.add_parser("doctor", help="Run read-only setup and device diagnostics")
     sub.add_parser("screen-info", help="Describe the selected device and display")
@@ -127,6 +151,32 @@ def _require_confirmation(args: argparse.Namespace, action: str) -> None:
 
 
 def execute(args: argparse.Namespace) -> tuple[Any, int]:
+    if args.command == "files":
+        from .console import agent_call
+
+        return agent_call(
+            "/api/action",
+            {"task_id": args.task, "action": args.direction, "args": json.loads(sys.stdin.read())},
+        ), ExitCode.OK
+    if args.command == "console":
+        from .console import serve
+
+        serve(args.port, not args.no_open)
+        return {"stopped": True}, ExitCode.OK
+    if args.command == "task":
+        from .console import agent_call
+
+        if args.task_command == "list":
+            return agent_call("/api/tasks"), ExitCode.OK
+        if args.task_command == "request":
+            return agent_call("/api/tasks", json.loads(sys.stdin.read())), ExitCode.OK
+        payload = {"task_id": args.task_id}
+        if args.task_command == "action":
+            payload.update(
+                action=args.action, args=json.loads(sys.stdin.read()) if args.stdin else {}
+            )
+            return agent_call("/api/action", payload), ExitCode.OK
+        return agent_call("/api/" + args.task_command, payload), ExitCode.OK
     if args.command == "skill":
         if args.destination and not args.install:
             raise HarnessError(
@@ -150,6 +200,25 @@ def execute(args: argparse.Namespace) -> tuple[Any, int]:
     if args.command != "helper":
         device.ensure_ready()
 
+    if args.command in {
+        "capabilities",
+        "observe",
+        "find",
+        "tap-element",
+        "wait-for",
+        "batch",
+        "open-url",
+    }:
+        from .actions import execute_action
+
+        payload = json.loads(sys.stdin.read()) if args.stdin else {}
+        if args.screenshot:
+            payload["screenshot"] = True
+        if args.command == "batch":
+            raise HarnessError(
+                "Batch execution requires an approved task; use task action ID batch --stdin."
+            )
+        return execute_action(device, args.command, payload), ExitCode.OK
     if args.command == "screen-info":
         return device.screen_info(), ExitCode.OK
     if args.command == "screenshot":
@@ -238,6 +307,8 @@ def execute(args: argparse.Namespace) -> tuple[Any, int]:
 
 
 def main(argv: list[str] | None = None) -> int:
+    if hasattr(sys.stdin, "reconfigure"):
+        sys.stdin.reconfigure(encoding="utf-8")
     _configure_console_stream(sys.stdout)
     _configure_console_stream(sys.stderr)
     parser = build_parser()
@@ -249,6 +320,13 @@ def main(argv: list[str] | None = None) -> int:
         else:
             _emit(result, json_mode=args.json, success=code == ExitCode.OK)
         return int(code)
+    except (ValueError, KeyError, TypeError):
+        error = HarnessError("Invalid command arguments or JSON payload.", code=ExitCode.USAGE)
+        if args.json:
+            print(json.dumps(error.to_dict()))
+        else:
+            print(error.message, file=sys.stderr)
+        return int(error.code)
     except HarnessError as exc:
         if args.json:
             print(json.dumps(exc.to_dict(), ensure_ascii=False, indent=2))

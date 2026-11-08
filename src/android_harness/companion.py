@@ -124,7 +124,7 @@ class CompanionBridge:
             if result.returncode != 0 or "result=-1" not in output:
                 raise OperationError(
                     "Companion IME did not accept the text. Ensure a text field is focused.",
-                    details={"bridge_output": output.strip()[-500:]},
+                    details={"returncode": result.returncode},
                 )
         finally:
             if changed and previous and previous != "null":
